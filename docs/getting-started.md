@@ -15,7 +15,7 @@ Before you begin, make sure you have:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/onyx-mcp-server.git
+git clone https://github.com/lupuletic/onyx-mcp-server.git
 cd onyx-mcp-server
 ```
 

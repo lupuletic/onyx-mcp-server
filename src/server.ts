@@ -47,6 +47,7 @@ export class OnyxMcpServer {
     this.setupToolHandlers();
     
     // Error handling
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.server.onerror = (error: any) => console.error('[MCP Error]', error);
     process.on('SIGINT', async () => {
       await this.server.close();
@@ -77,8 +78,12 @@ export class OnyxMcpServer {
    * Run the server
    * @param transport The server transport
    */
+  // Using any for transport as the Transport type is not exported from the SDK
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async run(transport: any) {
-    await this.server.connect(transport);
+    // Set up request handlers before connecting
+    this.setupToolHandlers();
+    
     this.server.setRequestHandler(ListToolsRequestSchema, async () => {
       return {
         tools: [
@@ -87,6 +92,15 @@ export class OnyxMcpServer {
         ],
       };
     });
+    
+    // Connect to the transport
+    await this.server.connect(transport);
+    
+    // For testing purposes, if the transport has a setupForTest method, call it
+    if (transport.setupForTest && typeof transport.setupForTest === 'function') {
+      transport.setupForTest();
+    }
+    
     console.error('Onyx MCP Server running on stdio');
   }
 }

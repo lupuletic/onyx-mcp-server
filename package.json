@@ -8,11 +8,13 @@
     "build": "tsc && chmod +x build/index.js",
     "start": "node build/index.js",
     "dev": "ts-node src/index.ts",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
-    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.config.cjs",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.config.cjs --watch",
+    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.config.cjs --coverage",
+    "lint": "eslint . --ext .ts --config .eslintrc.cjs --max-warnings=${ESLINT_MAX_WARNINGS:-0}",
+    "lint:fix": "eslint . --ext .ts --config .eslintrc.cjs --fix",
+    "prepare": "husky",
+    "prepublishOnly": "npm run lint && npm run test && npm run build"
   },
   "keywords": [
     "mcp",
@@ -29,12 +31,18 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/onyx-mcp-server.git"
+    "url": "https://github.com/lupuletic/onyx-mcp-server.git"
   },
-  "homepage": "https://github.com/yourusername/onyx-mcp-server#readme",
+  "homepage": "https://github.com/lupuletic/onyx-mcp-server#readme",
   "bugs": {
-    "url": "https://github.com/yourusername/onyx-mcp-server/issues"
+    "url": "https://github.com/lupuletic/onyx-mcp-server/issues"
   },
+  "files": [
+    "build/**/*",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "dependencies": {
     "@modelcontextprotocol/sdk": "latest",
     "axios": "^1.6.7"
@@ -45,10 +53,15 @@
     "@typescript-eslint/eslint-plugin": "^7.0.1",
     "@typescript-eslint/parser": "^7.0.1",
     "eslint": "^8.56.0",
+    "husky": "^9.1.7",
     "jest": "^29.7.0",
+    "lint-staged": "^15.5.0",
     "nock": "^13.5.1",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
+  },
+  "lint-staged": {
+    "*.ts": "eslint --config .eslintrc.cjs --fix"
   }
 }
