@@ -1,18 +1,23 @@
 name: Publish to npm
 
 on:
+  # Trigger on PR merge to main
   push:
     branches: [ main ]
-    # Optionally trigger on tags as well
-    tags:
-      - 'v*'
+  # Optionally trigger on tags
+  # tags:
+  #   - 'v*'
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        # Fetch all history for determining version bump
+        fetch-depth: 0
     
     - name: Use Node.js
       uses: actions/setup-node@v3
@@ -33,6 +38,80 @@ jobs:
     
     - name: Build
       run: npm run build
+    
+    - name: Configure Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+    
+    - name: Determine version bump type
+      id: version-bump
+      run: |
+        # Get the PR title from the last merge commit
+        PR_TITLE=$(git log -1 --pretty=%B | head -1)
+        echo "PR Title: $PR_TITLE"
+        
+        # Get all commit messages from the PR
+        COMMIT_MESSAGES=$(git log --format=%B -n 10)
+        echo "Analyzing recent commit messages..."
+        
+        # Initialize bump type as patch (default)
+        BUMP_TYPE="patch"
+        
+        # Function to check for conventional commit prefixes
+        check_for_prefixes() {
+          local message="$1"
+          
+          # Check for breaking changes (highest priority)
+          if [[ "$message" == *"BREAKING CHANGE"* ]] || [[ "$message" == *"!"* ]]; then
+            echo "Detected breaking change - using major version bump"
+            BUMP_TYPE="major"
+            return 0
+          fi
+          
+          # Check for features (medium priority)
+          if [[ "$message" == "feat"* ]] || [[ "$message" == "feat:"* ]] || [[ "$message" =~ "feat\(" ]]; then
+            # Only upgrade to minor if we haven't already decided on major
+            if [[ "$BUMP_TYPE" != "major" ]]; then
+              echo "Detected new feature - using minor version bump"
+              BUMP_TYPE="minor"
+            fi
+            return 0
+          fi
+          
+          # Check for fixes (lowest priority)
+          if [[ "$message" == "fix"* ]] || [[ "$message" == "fix:"* ]] || [[ "$message" =~ "fix\(" ]]; then
+            # Only set to patch if we haven't decided on minor or major
+            if [[ "$BUMP_TYPE" != "major" ]] && [[ "$BUMP_TYPE" != "minor" ]]; then
+              echo "Detected bug fix - using patch version bump"
+              BUMP_TYPE="patch"
+            fi
+            return 0
+          fi
+          
+          return 1
+        }
+        
+        # First check the PR title (highest priority)
+        check_for_prefixes "$PR_TITLE"
+        
+        # Then check each commit message
+        echo "$COMMIT_MESSAGES" | while read -r message; do
+          if [[ -n "$message" ]]; then
+            check_for_prefixes "$message"
+          fi
+        done
+        
+        # Output the final decision
+        echo "Final decision: $BUMP_TYPE version bump"
+        echo "bump_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
+    
+    - name: Bump version
+      run: |
+        echo "Bumping version: ${{ steps.version-bump.outputs.bump_type }}"
+        npm version ${{ steps.version-bump.outputs.bump_type }} -m "Bump version to %s [skip ci]"
+        git push
+        git push --tags
     
     - name: Publish to npm
       run: npm publish

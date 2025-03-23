@@ -228,12 +228,36 @@ npm run lint:fix
 
 ## Continuous Integration
 
-This project uses GitHub Actions for continuous integration. The CI pipeline runs on every push to the main branch and on pull requests. It performs the following checks:
+This project uses GitHub Actions for continuous integration and deployment. The CI pipeline runs on every push to the main branch and on pull requests. It performs the following checks:
 
 - Linting
 - Building
 - Testing
 - Code coverage reporting
+
+### Automated Version Bumping and Publishing
+
+When a PR is merged to the main branch, the project automatically determines the appropriate version bump type and publishes to npm. The system works as follows:
+
+1. **PR Title Validation**: All PR titles are validated against the [Conventional Commits](https://www.conventionalcommits.org/) specification:
+   - PR titles must start with a type (e.g., `feat:`, `fix:`, `docs:`)
+   - This validation happens automatically when a PR is created or updated
+   - PRs with invalid titles will fail the validation check
+
+2. **Version Bump Determination**: The system analyzes both the PR title and commit messages to determine the appropriate version bump:
+   - PR titles starting with `feat` or containing new features → minor version bump
+   - PR titles starting with `fix` or containing bug fixes → patch version bump
+   - PR titles containing `BREAKING CHANGE` or with an exclamation mark → major version bump
+   - If the PR title doesn't indicate a specific bump type, the system analyzes commit messages
+   - The highest priority bump type found in any commit message is used (major > minor > patch)
+   - If no conventional commit prefixes are found, defaults to patch
+
+3. **Version Update and Publishing**:
+   - Bumps the version in package.json according to semantic versioning
+   - Commits and pushes the version change
+   - Publishes the new version to npm
+
+This automated process ensures consistent versioning based on the nature of the changes, following semantic versioning principles, and eliminates manual version management.
 
 ## Contributing
 
