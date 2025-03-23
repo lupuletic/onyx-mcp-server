@@ -87,11 +87,20 @@ jobs:
         # Function to check for conventional commit prefixes
         check_for_prefixes() {
           local message="$1"
-          
+
+          # Skip GitHub's automated merge commit messages
+          if [[ "$message" =~ ^Merge\ pull\ request\ #[0-9]+\ from\ .* ]]; then
+            echo "Detected GitHub merge commit message, skipping: $message"
+            # Don't change BUMP_TYPE for merge commits, just return success
+            return 0
+          fi
+
+          # Continue with conventional commit checking
           # Check for breaking changes (highest priority)
           if [[ "$message" == *"BREAKING CHANGE"* ]] || [[ "$message" == *"!"* ]]; then
             echo "Detected breaking change - using major version bump"
             BUMP_TYPE="major"
+            FOUND_CONVENTIONAL_COMMIT=true
             return 0
           fi
           
@@ -101,6 +110,7 @@ jobs:
             if [[ "$BUMP_TYPE" != "major" ]]; then
               echo "Detected new feature - using minor version bump"
               BUMP_TYPE="minor"
+              FOUND_CONVENTIONAL_COMMIT=true
             fi
             return 0
           fi
@@ -111,22 +121,34 @@ jobs:
             if [[ "$BUMP_TYPE" != "major" ]] && [[ "$BUMP_TYPE" != "minor" ]]; then
               echo "Detected bug fix - using patch version bump"
               BUMP_TYPE="patch"
+              FOUND_CONVENTIONAL_COMMIT=true
             fi
             return 0
           fi
           
+          # For non-merge commits that don't match conventions, we should report an error
+          echo "WARNING: No conventional commit prefix found in: $message"
           return 1
         }
         
         # First check the PR title (highest priority)
         check_for_prefixes "$PR_TITLE"
+        # If the check failed but it's not a merge commit, we need to handle it
+        PR_CHECK_RESULT=$?
+        if [[ $PR_CHECK_RESULT -ne 0 ]]; then
+          echo "PR title doesn't follow conventional commit format and is not a merge commit"
+          echo "Will still check individual commits for version bump determination"
+        fi
         
         # Save the current BUMP_TYPE after checking PR title
         echo "After PR title check: BUMP_TYPE=$BUMP_TYPE"
         
         # Process commit messages one by one
         echo "Processing commit messages:"
+        # Set error handling to continue even if a command fails
+        set +e
         echo "$COMMIT_MESSAGES" > /tmp/commit_messages.txt
+        FOUND_CONVENTIONAL_COMMIT=false
         while IFS= read -r message; do
           echo "Processing message: $message"
           if [[ -n "$message" ]]; then
@@ -134,8 +156,19 @@ jobs:
             echo "After checking message: BUMP_TYPE=$BUMP_TYPE"
           fi
         done < /tmp/commit_messages.txt
+        # Restore error handling
+        set -e
         
         echo "BUMP_TYPE after processing all messages: $BUMP_TYPE"
+
+        # Check if we found at least one conventional commit
+        if [[ "$BUMP_TYPE" == "patch" ]] && [[ "$FOUND_CONVENTIONAL_COMMIT" == "false" ]]; then
+          echo "WARNING: No conventional commits found in this PR"
+          echo "Using default patch version bump"
+        else
+          echo "Found conventional commits, using determined version bump: $BUMP_TYPE"
+        fi
+        
         
         # Output the final decision
         echo "Final decision: $BUMP_TYPE version bump"
