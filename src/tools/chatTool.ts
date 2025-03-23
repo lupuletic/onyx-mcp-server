@@ -21,8 +21,8 @@ export async function handleChatWithOnyx(args: any, onyxApiService: OnyxApiServi
     const { 
       query, 
       personaId = 15, 
-      documentSets = [], 
-      enableAutoDetectFilters = true, 
+      documentSets = [],
+      // Unused parameter removed: enableAutoDetectFilters
       chatSessionId = null 
     } = args as ChatParams;
     

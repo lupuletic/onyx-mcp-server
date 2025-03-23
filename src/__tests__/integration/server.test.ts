@@ -1,7 +1,7 @@
 /**
  * Integration tests for the Onyx MCP Server
  */
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+// Server import removed as it's not used
 import { OnyxMcpServer } from '../../server.js';
 import nock from 'nock';
 

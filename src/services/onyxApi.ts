@@ -47,7 +47,7 @@ export class OnyxApiService {
           },
           chunks_above: chunksAbove,
           chunks_below: chunksBelow,
-          evaluation_type: "basic" // Enable LLM relevance filtering
+          evaluation_type: 'basic' // Enable LLM relevance filtering
         },
         {
           headers: {
@@ -147,7 +147,7 @@ export class OnyxApiService {
         createSessionUrl,
         {
           persona_id: personaId,
-          description: "API Test Chat"
+          description: 'API Test Chat'
         },
         {
           headers: {
@@ -192,7 +192,7 @@ export class OnyxApiService {
       file_descriptors: [],
       prompt_id: null,
       retrieval_options: {
-        run_search: "auto",
+        run_search: 'auto',
         real_time: true,
         filters: {
           document_set: documentSets.length > 0 ? documentSets : null,
@@ -205,7 +205,7 @@ export class OnyxApiService {
     };
     
     if (DEBUG) {
-      console.error(`=== DEBUG INFO ===`);
+      console.error('=== DEBUG INFO ===');
       console.error(`API URL: ${this.config.apiUrl}`);
       console.error(`Send Message URL: ${sendMessageUrl}`);
       console.error(`Message Payload: ${JSON.stringify(messagePayload)}`);
@@ -277,7 +277,7 @@ export class OnyxApiService {
     } catch (error) {
       console.error('Error sending chat message:', error);
       if (axios.isAxiosError(error) && error.response) {
-        console.error(`=== ERROR DETAILS ===`);
+        console.error('=== ERROR DETAILS ===');
         console.error(`Response status: ${error.response?.status}`);
         console.error(`Response data: ${JSON.stringify(error.response?.data)}`);
         
