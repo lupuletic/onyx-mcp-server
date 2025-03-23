@@ -8,11 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Automated version bumping based on conventional commit prefixes in PR titles
+- Automated version bumping based on conventional commit prefixes in PR titles and commit messages
+- Commit message validation using commitlint to enforce conventional commit format
+- Interactive commit message creation using commitizen (via `npm run commit`)
+- Git hooks to enforce commit message format and code quality
 
 ### Changed
 - Consolidated CI/CD workflows to avoid duplication
 - Improved npm publishing process to automatically determine version bump type
+- Enhanced PR template with clearer instructions for conventional commit format
 
 ## [1.0.0] - 2025-03-23
 

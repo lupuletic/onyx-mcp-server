@@ -119,7 +119,7 @@ To set up the project for local development:
 
 ### Commit Message Guidelines
 
-We strictly follow the [Conventional Commits](https://www.conventionalcommits.org/) specification for our commit messages. This is important because:
+We strictly follow the [Conventional Commits](https://www.conventionalcommits.org/) specification for our commit messages. **This is enforced by our git hooks** and is important because:
 
 1. It helps with automatic version bumping
 2. It makes the project history more readable and organized
@@ -145,6 +145,19 @@ For breaking changes, add an exclamation mark after the type/scope or include "B
 ```
 feat!: redesign API with breaking changes
 ```
+
+### Commit Tools
+
+This project uses several tools to help you write conventional commits and enforce the commit message format:
+
+1. **Commitizen**: A CLI tool that helps you write conventional commit messages
+   - Use `npm run commit` instead of `git commit` to get an interactive prompt
+   - This will guide you through creating a properly formatted commit message
+
+2. **Commitlint**: A tool that checks if your commit messages meet the conventional commit format
+   - This runs automatically when you commit
+   - If your commit message doesn't follow the format, the commit will be rejected
+   - You'll need to fix the message and try again
 
 ## License
 
