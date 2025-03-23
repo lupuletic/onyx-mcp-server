@@ -1,12 +1,11 @@
-name: CI
+name: PR Validation
 
 on:
-  push:
-    branches-ignore: [ main ]  # Don't run on main as npm-publish.yml handles that
   pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
-  build:
+  validate-pr:
     runs-on: ubuntu-latest
 
     steps:

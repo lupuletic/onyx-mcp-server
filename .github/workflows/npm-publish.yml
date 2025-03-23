@@ -9,7 +9,7 @@ on:
   #   - 'v*'
 
 jobs:
-  publish:
+  build-and-publish:
     runs-on: ubuntu-latest
     permissions:
       contents: write      # Needed for pushing commits and tags
@@ -19,8 +19,8 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
       with:
-        # Fetch all history and pull request info for determining version bump
-        fetch-depth: 0
+        # Fetch enough history for version bump determination
+        fetch-depth: 50
         ref: ${{ github.ref }}
     
     - name: Use Node.js
@@ -56,8 +56,27 @@ jobs:
         echo "PR Title: $PR_TITLE"
         
         # Get all commit messages from the PR
-        COMMIT_MESSAGES=$(git log HEAD~10..HEAD --format=%s)
-        echo "Analyzing recent commit messages..."
+        echo "Analyzing recent commit messages (if available)..."
+        # Try to get commit messages, but don't fail if we can't
+        COMMIT_MESSAGES=""
+        if git rev-parse HEAD~10 >/dev/null 2>&1; then
+          COMMIT_MESSAGES=$(git log HEAD~10..HEAD --format=%s)
+        else
+          # If we can't get 10 commits back, try with fewer
+          for i in {5..1}; do
+            if git rev-parse HEAD~$i >/dev/null 2>&1; then
+              COMMIT_MESSAGES=$(git log HEAD~$i..HEAD --format=%s)
+              echo "Found $i commits to analyze"
+              break
+            fi
+          done
+        fi
+        
+        # If we still don't have any commit messages, just use the PR title
+        if [ -z "$COMMIT_MESSAGES" ]; then
+          echo "No commit history available, using only PR title for analysis"
+          COMMIT_MESSAGES="$PR_TITLE"
+        fi
         
         # Initialize bump type as patch (default)
         BUMP_TYPE="patch"
@@ -113,19 +132,17 @@ jobs:
     - name: Bump version
       run: |
         echo "Bumping version: ${{ steps.version-bump.outputs.bump_type }}"
-        # Update version in package.json without git commit
-        npm version ${{ steps.version-bump.outputs.bump_type }} --no-git-tag-version
-        
-        # Get the new version
-        NEW_VERSION=$(node -p "require('./package.json').version")
-        echo "New version: $NEW_VERSION"
-        
-        # Commit and push the version change
-        git add package.json
-        git commit -m "Bump version to $NEW_VERSION [skip ci]"
-        git tag -a "v$NEW_VERSION" -m "Version $NEW_VERSION"
-        git push origin HEAD:main
-        git push origin "v$NEW_VERSION"
+        # Set up git user
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+
+        # Use npm version to bump version, create commit and tag
+        npm version ${{ steps.version-bump.outputs.bump_type }} -m "Bump version to %s [skip ci]"
+
+        # Push changes back to the repository
+        git push https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:main --tags
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
     - name: Publish to npm
       run: npm publish

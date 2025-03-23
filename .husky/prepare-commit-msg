@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Check if commit is merge commit or a commit ammend
+if [ -z "${2}" ]; then
+  # Only use commitizen when no commit type is already set
+  grep -q "^[a-z]\+(" "$1" || exec < /dev/tty npx cz --hook || true
+fi

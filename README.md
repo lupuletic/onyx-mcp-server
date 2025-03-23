@@ -203,6 +203,26 @@ For the best results, you can use both tools in combination - search for specifi
 npm run dev
 ```
 
+### Committing Changes
+
+This project enforces the [Conventional Commits](https://www.conventionalcommits.org/) specification for all commit messages. To make this easier, we provide an interactive commit tool:
+
+```bash
+npm run commit
+```
+
+This will guide you through creating a properly formatted commit message. Alternatively, you can write your own commit messages following the conventional format:
+
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+Where `type` is one of: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
+
 ### Building for Production
 
 ```bash
@@ -246,14 +266,20 @@ This project uses GitHub Actions for continuous integration and deployment. The 
 
 ### Automated Version Bumping and Publishing
 
-When a PR is merged to the main branch, the project automatically determines the appropriate version bump type and publishes to npm. The system works as follows:
+When a PR is merged to the main branch, the project automatically determines the appropriate version bump type and publishes to npm. The system analyzes both PR titles and commit messages to determine the version bump type.
 
 1. **PR Title Validation**: All PR titles are validated against the [Conventional Commits](https://www.conventionalcommits.org/) specification:
    - PR titles must start with a type (e.g., `feat:`, `fix:`, `docs:`)
    - This validation happens automatically when a PR is created or updated
    - PRs with invalid titles will fail the validation check
 
-2. **Version Bump Determination**: The system analyzes both the PR title and commit messages to determine the appropriate version bump:
+2. **Commit Message Validation**: All commit messages are also validated against the conventional commits format:
+   - Commit messages must start with a type (e.g., `feat:`, `fix:`, `docs:`)
+   - This is enforced by git hooks that run when you commit
+   - Commits with invalid messages will be rejected
+   - Use `npm run commit` for an interactive commit message creation tool
+
+3. **Version Bump Determination**: The system analyzes both the PR title and commit messages to determine the appropriate version bump:
    - PR titles starting with `feat` or containing new features → minor version bump
    - PR titles starting with `fix` or containing bug fixes → patch version bump
    - PR titles containing `BREAKING CHANGE` or with an exclamation mark → major version bump
@@ -261,7 +287,7 @@ When a PR is merged to the main branch, the project automatically determines the
    - The highest priority bump type found in any commit message is used (major > minor > patch)
    - If no conventional commit prefixes are found, defaults to patch
 
-3. **Version Update and Publishing**:
+4. **Version Update and Publishing**:
    - Bumps the version in package.json according to semantic versioning
    - Commits and pushes the version change
    - Publishes the new version to npm
