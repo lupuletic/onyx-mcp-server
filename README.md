@@ -305,3 +305,8 @@ If you discover a security vulnerability, please follow our [Security Policy](SE
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+
+<a href="https://glama.ai/mcp/servers/@lupuletic/onyx-mcp-server">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@lupuletic/onyx-mcp-server/badge" />
+</a>
