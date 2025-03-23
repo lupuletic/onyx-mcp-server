@@ -21,8 +21,10 @@ jobs:
     - name: Install dependencies
       run: npm ci
     
-    - name: Lint
+    - name: Lint (fail on warnings)
       run: npm run lint
+      env:
+        ESLINT_MAX_WARNINGS: 0
     
     - name: Build
       run: npm run build

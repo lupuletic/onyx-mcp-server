@@ -1,8 +1,13 @@
 /**
  * Unit tests for the main entry point
  */
-import * as fs from 'fs';
-import * as path from 'path';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// ES modules equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 describe('Main Entry Point', () => {
   it('should have a main function that starts the server', async () => {

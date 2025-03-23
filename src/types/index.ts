@@ -17,6 +17,14 @@ export interface OnyxSearchResult {
 }
 
 /**
+ * Onyx document interface
+ */
+export interface OnyxDocument {
+  document_id: string;
+  semantic_identifier: string;
+}
+
+/**
  * Document information interface
  */
 export interface DocumentInfo {
@@ -61,6 +69,17 @@ export interface ChatParams {
   documentSets?: string[];
   enableAutoDetectFilters?: boolean;
   chatSessionId?: string | null;
+}
+
+/**
+ * Chat content response interface
+ */
+export interface ChatContentResponse {
+  type: string;
+  text: string;
+  metadata?: {
+    chat_session_id: string;
+  };
 }
 
 /**

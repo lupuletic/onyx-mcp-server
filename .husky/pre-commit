@@ -1,4 +1,15 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+# Run lint-staged (defined in package.json)
 npx lint-staged
+
+# Run full lint check to catch warnings as well
+npm run lint
+if [ $? -ne 0 ]; then
+  echo "❌ Linting failed. Please fix the issues before committing."
+  exit 1
+fi
+
+# All checks passed
+echo "✅ Pre-commit checks passed!"

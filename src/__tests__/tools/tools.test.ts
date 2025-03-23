@@ -4,27 +4,34 @@
 import { handleChatWithOnyx } from '../../tools/chatTool.js';
 import { handleSearchOnyx } from '../../tools/searchTool.js';
 import { OnyxApiService } from '../../services/onyxApi.js';
-import { OnyxSearchResult } from '../../types/index.js';
+import type { OnyxSearchResult, ChatContentResponse } from '../../types/index.js';
+import { jest } from '@jest/globals';
 
 describe('Tool Handlers', () => {
   let mockOnyxApiService: OnyxApiService;
 
   beforeEach(() => {
     // Create a mock instance of OnyxApiService
-    mockOnyxApiService = new OnyxApiService({
+    mockOnyxApiService = {
       apiUrl: 'http://test-api.com/api',
       apiToken: 'test-token',
-    });
+      createChatSession: jest.fn<() => Promise<string>>(),
+      sendChatMessage: jest.fn(),
+      searchOnyx: jest.fn(),
+      fetchDocumentChunk: jest.fn(),
+      fetchDocumentContent: jest.fn(),
+      buildContext: jest.fn()
+    } as unknown as OnyxApiService;
   });
 
   describe('handleChatWithOnyx', () => {
     beforeEach(() => {
       // Set up the mock implementations
-      mockOnyxApiService.createChatSession = jest.fn().mockImplementation(() => {
+      (mockOnyxApiService.createChatSession as jest.Mock).mockImplementation(() => {
         return Promise.resolve('test-session-id');
       });
       
-      mockOnyxApiService.sendChatMessage = jest.fn().mockImplementation(() => {
+      (mockOnyxApiService.sendChatMessage as jest.Mock).mockImplementation(() => {
         return Promise.resolve({
           answer: 'Test answer',
           documents: [
@@ -86,13 +93,13 @@ describe('Tool Handlers', () => {
       expect(result.content[0].text).toContain('doc2');
       
       // Use type assertion to access metadata
-      const content = result.content[0] as any;
+      const content = result.content[0] as ChatContentResponse;
       expect(content.metadata?.chat_session_id).toBe('test-session-id');
     });
 
     it('should handle API errors gracefully', async () => {
       // Mock the API to throw an error
-      mockOnyxApiService.createChatSession = jest.fn().mockImplementation(() => {
+      (mockOnyxApiService.createChatSession as jest.Mock).mockImplementation(() => {
         return Promise.reject(new Error('API error'));
       });
       
@@ -107,7 +114,7 @@ describe('Tool Handlers', () => {
   describe('handleSearchOnyx', () => {
     beforeEach(() => {
       // Set up the mock implementations
-      mockOnyxApiService.searchOnyx = jest.fn().mockImplementation(() => {
+      (mockOnyxApiService.searchOnyx as jest.Mock).mockImplementation(() => {
         const results: OnyxSearchResult[] = [
           {
             document_id: 'doc1',
@@ -131,14 +138,17 @@ describe('Tool Handlers', () => {
         return Promise.resolve(results);
       });
       
+      // @ts-expect-error - TypeScript errors for mock implementation
       mockOnyxApiService.fetchDocumentChunk = jest.fn().mockImplementation(
-        (docId: string, chunkId: number) => Promise.resolve(`Content for ${docId} chunk ${chunkId}`)
+        () => Promise.resolve('Mocked chunk content')
       );
       
+      // @ts-expect-error - TypeScript errors for mock implementation
       mockOnyxApiService.fetchDocumentContent = jest.fn().mockImplementation(
-        (docId: string) => Promise.resolve(`Full content for ${docId}`)
+        () => Promise.resolve('Mocked document content')
       );
       
+      // @ts-expect-error - TypeScript errors for mock implementation
       mockOnyxApiService.buildContext = jest.fn().mockReturnValue('Formatted context');
     });
 
@@ -215,7 +225,7 @@ describe('Tool Handlers', () => {
 
     it('should handle API errors gracefully', async () => {
       // Mock the API to throw an error
-      mockOnyxApiService.searchOnyx = jest.fn().mockImplementation(() => {
+      (mockOnyxApiService.searchOnyx as jest.Mock).mockImplementation(() => {
         return Promise.reject(new Error('API error'));
       });
       

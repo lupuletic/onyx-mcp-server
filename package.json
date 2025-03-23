@@ -11,7 +11,7 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.config.cjs",
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.config.cjs --watch",
     "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.config.cjs --coverage",
-    "lint": "eslint . --ext .ts --config .eslintrc.cjs",
+    "lint": "eslint . --ext .ts --config .eslintrc.cjs --max-warnings=${ESLINT_MAX_WARNINGS:-0}",
     "lint:fix": "eslint . --ext .ts --config .eslintrc.cjs --fix",
     "prepare": "husky"
   },
