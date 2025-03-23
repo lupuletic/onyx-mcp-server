@@ -12,7 +12,7 @@ import { ChatParams } from '../types/index.js';
  * @param onyxApiService The Onyx API service
  * @returns The tool response
  */
-export async function handleChatWithOnyx(args: any, onyxApiService: OnyxApiService) {
+export async function handleChatWithOnyx(args: unknown, onyxApiService: OnyxApiService) {
   try {
     if (typeof args !== 'object' || args === null) {
       throw new McpError(ErrorCode.InvalidParams, 'Invalid arguments');

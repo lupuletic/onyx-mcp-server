@@ -1,12 +1,22 @@
 // Global Jest types
 declare const describe: (name: string, fn: () => void) => void;
 declare const it: (name: string, fn: () => void | Promise<void>) => void;
-declare const expect: any;
+declare const expect: {
+  <T>(actual: T): jest.Matchers<T>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  any(constructor: any): any;
+};
 declare const beforeEach: (fn: () => void) => void;
 declare const afterEach: (fn: () => void) => void;
 declare const beforeAll: (fn: () => void) => void;
 declare const afterAll: (fn: () => void) => void;
-declare const jest: any;
+declare const jest: {
+  fn: <T = unknown>() => jest.Mock<T>;
+  mock: (moduleName: string) => void;
+  spyOn: <T extends object, M extends keyof T>(object: T, method: M) => jest.SpyInstance;
+  setTimeout: (timeout: number) => void;
+  resetModules: () => void;
+};
 
 // Third-party module declarations
 declare module 'nock' {
@@ -16,20 +26,20 @@ declare module 'nock' {
   
   interface Scope {
     get(path: string): Interceptor;
-    post(path: string, body?: any): Interceptor;
-    put(path: string, body?: any): Interceptor;
+    post(path: string, body?: Record<string, unknown>): Interceptor;
+    put(path: string, body?: Record<string, unknown>): Interceptor;
     delete(path: string): Interceptor;
-    patch(path: string, body?: any): Interceptor;
-    query(params: any): Scope;
-    reply(statusCode: number, body?: any, headers?: any): Scope;
-    replyWithError(error: any): Scope;
+    patch(path: string, body?: Record<string, unknown>): Interceptor;
+    query(params: Record<string, string | number | boolean>): Scope;
+    reply(statusCode: number, body?: string | Record<string, unknown>, headers?: Record<string, string>): Scope;
+    replyWithError(error: Error | string): Scope;
     persist(): Scope;
   }
   
   interface Interceptor {
-    query(params: any): Interceptor;
-    reply(statusCode: number, body?: any, headers?: any): Scope;
-    replyWithError(error: any): Scope;
+    query(params: Record<string, string | number | boolean>): Interceptor;
+    reply(statusCode: number, body?: string | Record<string, unknown>, headers?: Record<string, string>): Scope;
+    replyWithError(error: Error | string): Scope;
   }
   
   function nock(basePath: string): Scope;

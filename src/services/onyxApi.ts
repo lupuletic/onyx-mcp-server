@@ -7,6 +7,16 @@ import { OnyxConfig, OnyxSearchResult } from '../types/index.js';
 import { DEBUG } from '../config/index.js';
 
 /**
+ * Document interface for chat responses
+ */
+interface OnyxDocument {
+  document_id: string;
+  semantic_identifier: string;
+  score?: number;
+  link?: string;
+}
+
+/**
  * OnyxApiService class for interacting with the Onyx API
  */
 export class OnyxApiService {
@@ -179,7 +189,7 @@ export class OnyxApiService {
    * @param documentSets Optional document sets to search within
    * @returns The chat response
    */
-  async sendChatMessage(sessionId: string, query: string, documentSets: string[] = []): Promise<{ answer: string, documents: any[] }> {
+  async sendChatMessage(sessionId: string, query: string, documentSets: string[] = []): Promise<{ answer: string, documents: OnyxDocument[] }> {
     const sendMessageUrl = `${this.config.apiUrl}/chat/send-message`;
     console.error(`Sending message to: ${sendMessageUrl}`);
     console.error(`With chat_session_id: ${sessionId}`);
@@ -234,7 +244,8 @@ export class OnyxApiService {
       
       // Initialize variables for answer and documents
       let answer = '';
-      let documents: any[] = [];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let documents: OnyxDocument[] = [];
       
       try {
         // First try parsing as a single JSON object
