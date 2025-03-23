@@ -9,7 +9,7 @@ on:
   #   - 'v*'
 
 jobs:
-  publish:
+  build-and-publish:
     runs-on: ubuntu-latest
     permissions:
       contents: write      # Needed for pushing commits and tags

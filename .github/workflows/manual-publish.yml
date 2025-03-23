@@ -19,7 +19,7 @@ on:
         type: boolean
 
 jobs:
-  publish:
+  manual-publish:
     runs-on: ubuntu-latest
     
     steps:
