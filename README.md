@@ -1,8 +1,9 @@
 # Onyx MCP Server
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![npm version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/yourusername/onyx-mcp-server)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/yourusername/onyx-mcp-server/blob/main/CONTRIBUTING.md)
+[![npm version](https://img.shields.io/npm/v/onyx-mcp-server.svg)](https://www.npmjs.com/package/onyx-mcp-server)
+[![npm downloads](https://img.shields.io/npm/dm/onyx-mcp-server.svg)](https://www.npmjs.com/package/onyx-mcp-server)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/lupuletic/onyx-mcp-server/blob/main/CONTRIBUTING.md)
 
 > A Model Context Protocol (MCP) server for seamless integration with Onyx AI knowledge bases.
 
@@ -28,7 +29,7 @@ This MCP server connects any MCP-compatible client to your Onyx knowledge base, 
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/onyx-mcp-server.git
+   git clone https://github.com/lupuletic/onyx-mcp-server.git
    cd onyx-mcp-server
    ```
 

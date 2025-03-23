@@ -139,7 +139,7 @@ If you continue to experience issues:
    - Check your MCP client logs if available
 
 2. **File an issue:**
-   - Submit a detailed bug report on our [GitHub Issues page](https://github.com/yourusername/onyx-mcp-server/issues)
+   - Submit a detailed bug report on our [GitHub Issues page](https://github.com/lupuletic/onyx-mcp-server/issues)
    - Include steps to reproduce, expected behavior, and actual behavior
 
 3. **Contact Onyx support:**

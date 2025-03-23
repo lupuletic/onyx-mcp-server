@@ -13,7 +13,8 @@
     "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.config.cjs --coverage",
     "lint": "eslint . --ext .ts --config .eslintrc.cjs --max-warnings=${ESLINT_MAX_WARNINGS:-0}",
     "lint:fix": "eslint . --ext .ts --config .eslintrc.cjs --fix",
-    "prepare": "husky"
+    "prepare": "husky",
+    "prepublishOnly": "npm run lint && npm run test && npm run build"
   },
   "keywords": [
     "mcp",
@@ -30,12 +31,18 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/onyx-mcp-server.git"
+    "url": "https://github.com/lupuletic/onyx-mcp-server.git"
   },
-  "homepage": "https://github.com/yourusername/onyx-mcp-server#readme",
+  "homepage": "https://github.com/lupuletic/onyx-mcp-server#readme",
   "bugs": {
-    "url": "https://github.com/yourusername/onyx-mcp-server/issues"
+    "url": "https://github.com/lupuletic/onyx-mcp-server/issues"
   },
+  "files": [
+    "build/**/*",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "dependencies": {
     "@modelcontextprotocol/sdk": "latest",
     "axios": "^1.6.7"

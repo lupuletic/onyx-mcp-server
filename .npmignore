@@ -1,0 +1,25 @@
+# Source files
+src/
+# Test files
+**/*.test.ts
+**/__tests__/
+# Configuration files
+.eslintrc.cjs
+.eslintrc.js
+jest.config.cjs
+jest.config.js
+tsconfig.test.json
+# Git and GitHub files
+.git/
+.github/
+.gitignore
+# CI/CD files
+.husky/
+# Documentation
+docs/
+# Development files
+coverage/
+node_modules/
+# Misc
+.DS_Store
+.clinerules
