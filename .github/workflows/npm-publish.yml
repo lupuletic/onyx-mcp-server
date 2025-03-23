@@ -51,6 +51,9 @@ jobs:
     - name: Determine version bump type
       id: version-bump
       run: |
+        # Enable bash debugging
+        set -x
+        
         # Get the merge commit message (PR title)
         PR_TITLE=$(git log -1 --pretty=%s)
         echo "PR Title: $PR_TITLE"
@@ -118,22 +121,40 @@ jobs:
         # First check the PR title (highest priority)
         check_for_prefixes "$PR_TITLE"
         
-        # Then check each commit message (using a for loop to avoid subshell issues)
-        IFS=$'\n'
-        for message in $COMMIT_MESSAGES; do
+        # Save the current BUMP_TYPE after checking PR title
+        echo "After PR title check: BUMP_TYPE=$BUMP_TYPE"
+        
+        # Process commit messages one by one
+        echo "Processing commit messages:"
+        echo "$COMMIT_MESSAGES" > /tmp/commit_messages.txt
+        while IFS= read -r message; do
+          echo "Processing message: $message"
           if [[ -n "$message" ]]; then
             check_for_prefixes "$message"
+            echo "After checking message: BUMP_TYPE=$BUMP_TYPE"
           fi
-        done
-        unset IFS
+        done < /tmp/commit_messages.txt
+        
+        echo "BUMP_TYPE after processing all messages: $BUMP_TYPE"
         
         # Output the final decision
         echo "Final decision: $BUMP_TYPE version bump"
-        echo "bump_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
+        
+        # Set the output in a way that works with both older and newer GitHub Actions
+        if [ -n "$GITHUB_OUTPUT" ]; then
+          # New way (GitHub Actions runner >= 2.297.0)
+          echo "bump_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
+        else
+          # Old way (GitHub Actions runner < 2.297.0)
+          echo "::set-output name=bump_type::$BUMP_TYPE"
+        fi
     
     - name: Bump version
       run: |
         echo "Bumping version: ${{ steps.version-bump.outputs.bump_type }}"
+        # Debug output
+        echo "Version bump type from previous step: ${{ steps.version-bump.outputs.bump_type }}"
+        
         # Set up git user
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@github.com"
@@ -141,8 +162,13 @@ jobs:
         # Use npm version to bump version, create commit and tag
         npm version ${{ steps.version-bump.outputs.bump_type }} -m "Bump version to %s [skip ci]"
 
-        # Push changes back to the repository
-        git push https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:main --tags
+        # Push changes back to the repository with better error handling
+        echo "Pushing changes to repository..."
+        # Set the remote URL with token
+        git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+        # Push changes and tags
+        git push origin HEAD:main
+        git push origin --tags
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
