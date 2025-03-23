@@ -285,7 +285,7 @@ When a PR is merged to the main branch, the project automatically determines the
    - PR titles containing `BREAKING CHANGE` or with an exclamation mark → major version bump
    - If the PR title doesn't indicate a specific bump type, the system analyzes commit messages
    - The highest priority bump type found in any commit message is used (major > minor > patch)
-   - If no conventional commit prefixes are found, defaults to patch
+   - If no conventional commit prefixes are found, the system automatically defaults to a patch version bump without failing
 
 4. **Version Update and Publishing**:
    - Bumps the version in package.json according to semantic versioning

@@ -128,7 +128,9 @@ jobs:
           
           # For non-merge commits that don't match conventions, we should report an error
           echo "WARNING: No conventional commit prefix found in: $message"
-          return 1
+          # Instead of returning an error, we'll use the default patch version
+          echo "Using default patch version bump"
+          return 0
         }
         
         # First check the PR title (highest priority)
