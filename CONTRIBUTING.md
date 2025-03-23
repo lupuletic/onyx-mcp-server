@@ -36,6 +36,34 @@ This section guides you through submitting an enhancement suggestion, including 
 
 ### Pull Requests
 
+#### Important: PR Title Format
+
+All PR titles **must** follow the [Conventional Commits](https://www.conventionalcommits.org/) specification. This is enforced by our CI system and is used to automatically determine version bumps when publishing to npm.
+
+The format is: `type(scope): description`
+
+Where:
+- `type` is one of:
+  - `feat`: A new feature (triggers a minor version bump)
+  - `fix`: A bug fix (triggers a patch version bump)
+  - `docs`: Documentation only changes
+  - `style`: Changes that do not affect the meaning of the code
+  - `refactor`: A code change that neither fixes a bug nor adds a feature
+  - `perf`: A code change that improves performance
+  - `test`: Adding missing tests or correcting existing tests
+  - `chore`: Changes to the build process or auxiliary tools
+- `scope` is optional and indicates the section of the codebase affected
+- `description` is a short description of the change
+
+For breaking changes, add an exclamation mark after the type/scope or include "BREAKING CHANGE:" in the PR description. This will trigger a major version bump.
+
+Examples:
+- `feat: add support for chat session persistence`
+- `fix(api): correct response format for search endpoint`
+- `feat!: redesign API with breaking changes`
+
+#### PR Process
+
 The process described here has several goals:
 
 - Maintain the project's quality
@@ -91,7 +119,13 @@ To set up the project for local development:
 
 ### Commit Message Guidelines
 
-We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification for our commit messages:
+We strictly follow the [Conventional Commits](https://www.conventionalcommits.org/) specification for our commit messages. This is important because:
+
+1. It helps with automatic version bumping
+2. It makes the project history more readable and organized
+3. It enables automatic changelog generation
+
+The commit types are:
 
 - `feat`: A new feature
 - `fix`: A bug fix
@@ -105,6 +139,11 @@ We follow the [Conventional Commits](https://www.conventionalcommits.org/) speci
 Example:
 ```
 feat: add support for chat session persistence
+```
+
+For breaking changes, add an exclamation mark after the type/scope or include "BREAKING CHANGE:" in the commit body:
+```
+feat!: redesign API with breaking changes
 ```
 
 ## License
