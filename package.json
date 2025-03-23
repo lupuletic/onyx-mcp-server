@@ -1,6 +1,6 @@
 {
   "name": "onyx-mcp-server",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Model Context Protocol (MCP) server for seamless integration with Onyx AI knowledge bases",
   "main": "build/index.js",
   "type": "module",
