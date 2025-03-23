@@ -1,0 +1,33 @@
+# Smithery configuration file: https://smithery.ai/docs/config#smitheryyaml
+
+startCommand:
+  type: stdio
+  configSchema:
+    # JSON Schema defining the configuration options for the MCP.
+    type: object
+    required:
+      - onyxApiToken
+      - onyxApiUrl
+    properties:
+      onyxApiToken:
+        type: string
+        default: ""
+        description: Onyx API token for accessing the Onyx API.
+      onyxApiUrl:
+        type: string
+        default: http://localhost:8080/api
+        description: URL of the Onyx API (e.g., http://localhost:8080/api).
+  commandFunction:
+    # A JS function that produces the CLI command based on the given config to start the MCP on stdio.
+    |-
+    (config) => ({
+      command: 'node',
+      args: ['build/index.js'],
+      env: {
+        ONYX_API_TOKEN: config.onyxApiToken,
+        ONYX_API_URL: config.onyxApiUrl
+      }
+    })
+  exampleConfig:
+    onyxApiToken: your-api-token-here
+    onyxApiUrl: http://localhost:8080/api

@@ -23,6 +23,14 @@ This MCP server connects any MCP-compatible client to your Onyx knowledge base, 
 
 ## Installation
 
+### Installing via Smithery
+
+To install Onyx MCP Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@lupuletic/onyx-mcp-server):
+
+```bash
+npx -y @smithery/cli install @lupuletic/onyx-mcp-server --client claude
+```
+
 ### Prerequisites
 
 - Node.js (v16 or higher)
