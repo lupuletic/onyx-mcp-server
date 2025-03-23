@@ -118,12 +118,14 @@ jobs:
         # First check the PR title (highest priority)
         check_for_prefixes "$PR_TITLE"
         
-        # Then check each commit message
-        echo "$COMMIT_MESSAGES" | while read -r message; do
+        # Then check each commit message (using a for loop to avoid subshell issues)
+        IFS=$'\n'
+        for message in $COMMIT_MESSAGES; do
           if [[ -n "$message" ]]; then
             check_for_prefixes "$message"
           fi
         done
+        unset IFS
         
         # Output the final decision
         echo "Final decision: $BUMP_TYPE version bump"
