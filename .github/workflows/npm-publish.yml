@@ -11,13 +11,17 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write      # Needed for pushing commits and tags
+      pull-requests: read  # Needed for reading PR information
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
       with:
-        # Fetch all history for determining version bump
+        # Fetch all history and pull request info for determining version bump
         fetch-depth: 0
+        ref: ${{ github.ref }}
     
     - name: Use Node.js
       uses: actions/setup-node@v3
@@ -47,12 +51,12 @@ jobs:
     - name: Determine version bump type
       id: version-bump
       run: |
-        # Get the PR title from the last merge commit
-        PR_TITLE=$(git log -1 --pretty=%B | head -1)
+        # Get the merge commit message (PR title)
+        PR_TITLE=$(git log -1 --pretty=%s)
         echo "PR Title: $PR_TITLE"
         
         # Get all commit messages from the PR
-        COMMIT_MESSAGES=$(git log --format=%B -n 10)
+        COMMIT_MESSAGES=$(git log HEAD~10..HEAD --format=%s)
         echo "Analyzing recent commit messages..."
         
         # Initialize bump type as patch (default)
@@ -109,9 +113,19 @@ jobs:
     - name: Bump version
       run: |
         echo "Bumping version: ${{ steps.version-bump.outputs.bump_type }}"
-        npm version ${{ steps.version-bump.outputs.bump_type }} -m "Bump version to %s [skip ci]"
-        git push
-        git push --tags
+        # Update version in package.json without git commit
+        npm version ${{ steps.version-bump.outputs.bump_type }} --no-git-tag-version
+        
+        # Get the new version
+        NEW_VERSION=$(node -p "require('./package.json').version")
+        echo "New version: $NEW_VERSION"
+        
+        # Commit and push the version change
+        git add package.json
+        git commit -m "Bump version to $NEW_VERSION [skip ci]"
+        git tag -a "v$NEW_VERSION" -m "Version $NEW_VERSION"
+        git push origin HEAD:main
+        git push origin "v$NEW_VERSION"
     
     - name: Publish to npm
       run: npm publish
