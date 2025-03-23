@@ -9,6 +9,9 @@
 
 This MCP server connects any MCP-compatible client to your Onyx knowledge base, allowing you to search and retrieve relevant context from your documents. It provides a bridge between MCP clients and the Onyx API, enabling powerful semantic search and chat capabilities.
 
+<img width="1166" alt="image" src="https://github.com/user-attachments/assets/6396b010-cb1b-489c-98ec-dbb53e3996d2" />
+
+
 ## Features
 
 - **Enhanced Search**: Semantic search across your Onyx document sets with LLM relevance filtering
