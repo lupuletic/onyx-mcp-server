@@ -192,8 +192,15 @@ jobs:
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@github.com"
 
+        # Temporarily disable husky hooks for CI
+        echo "Temporarily disabling husky hooks for CI..."
+        export HUSKY=0
+        
         # Use npm version to bump version, create commit and tag
-        npm version ${{ steps.version-bump.outputs.bump_type }} -m "Bump version to %s [skip ci]"
+        # Use a conventional commit format for the version bump commit
+        npm version ${{ steps.version-bump.outputs.bump_type }} -m "chore(release): bump version to %s [skip ci]"
+        # Note: We're using both HUSKY=0 and a conventional commit format for maximum compatibility
+        # This ensures the commit passes even if commitlint is still somehow triggered
 
         # Push changes back to the repository with better error handling
         echo "Pushing changes to repository..."
