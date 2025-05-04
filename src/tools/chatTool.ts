@@ -5,6 +5,7 @@
 import { McpError, ErrorCode } from '@modelcontextprotocol/sdk/types.js';
 import { OnyxApiService } from '../services/onyxApi.js';
 import { ChatParams } from '../types/index.js';
+import { loadConfig } from '../config/index.js';
 
 /**
  * Handle the chat_with_onyx tool request
@@ -14,13 +15,15 @@ import { ChatParams } from '../types/index.js';
  */
 export async function handleChatWithOnyx(args: unknown, onyxApiService: OnyxApiService) {
   try {
+    const config = loadConfig();
+    
     if (typeof args !== 'object' || args === null) {
       throw new McpError(ErrorCode.InvalidParams, 'Invalid arguments');
     }
 
     const { 
       query, 
-      personaId = 15, 
+      personaId = config.defaultPersonaId, 
       documentSets = [],
       // Unused parameter removed: enableAutoDetectFilters
       chatSessionId = null 

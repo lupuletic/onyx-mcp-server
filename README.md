@@ -20,6 +20,8 @@ This MCP server connects any MCP-compatible client to your Onyx knowledge base, 
 - **Full Document Retrieval**: Option to retrieve entire documents instead of just chunks
 - **Chat Integration**: Use Onyx's powerful chat API with LLM + RAG for comprehensive answers
 - **Configurable Document Set Filtering**: Target specific document sets for more relevant results
+- **Multiple Transport Methods**: Supports both stdio (for CLI) and HTTP transport (for API clients)
+- **Environment Configuration**: Easy configuration via .env file
 
 ## Installation
 
@@ -55,16 +57,50 @@ npx -y @smithery/cli install @lupuletic/onyx-mcp-server --client claude
    npm run build
    ```
 
-4. Configure your Onyx API Token:
+4. Configure your environment:
    ```bash
-   export ONYX_API_TOKEN="your-api-token-here"
-   export ONYX_API_URL="http://localhost:8080/api"  # Adjust as needed
+   # Copy the example .env file
+   cp .env.example .env
+   
+   # Edit the .env file with your API token and settings
+   nano .env
    ```
 
 5. Start the server:
    ```bash
    npm start
    ```
+
+## Environment Configuration
+
+Onyx MCP Server can be configured using environment variables or a `.env` file. The following variables are available:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `ONYX_API_URL` | URL of the Onyx API | `http://localhost:8080/api` |
+| `ONYX_API_TOKEN` | Your Onyx API token | *(required)* |
+| `ONYX_DEFAULT_PERSONA_ID` | Default persona ID to use for chat if not specified by the client | `15` |
+| `HTTP_PORT` | Port for the HTTP server to listen on | `3000` |
+| `DEBUG` | Enable debug logging (true/false) | `false` |
+
+## Transport Methods
+
+The server supports two transport methods:
+
+1. **stdio** - Used for CLI applications and integration with desktop applications
+2. **HTTP** - Used for API clients and web applications
+
+When started, the server will listen on both transports simultaneously, so you can use whichever is most convenient for your application.
+
+### HTTP Endpoint
+
+The HTTP endpoint is available at:
+
+```
+http://localhost:3000/mcp
+```
+
+See the test client documentation for examples of how to interact with this endpoint.
 
 ## Configuring MCP Clients
 
@@ -110,13 +146,15 @@ Add to your Cline MCP settings file:
 }
 ```
 
-### For Other MCP Clients
+### For HTTP Clients
 
-Consult your MCP client's documentation for how to add a custom MCP server. You'll need to provide:
+For HTTP clients, simply point your client to the HTTP endpoint:
 
-- The command to run the server (`node`)
-- The path to the built server file (`/path/to/onyx-mcp-server/build/index.js`)
-- Environment variables for `ONYX_API_TOKEN` and `ONYX_API_URL`
+```
+http://localhost:3000/mcp
+```
+
+See the [test client documentation](test-client/README.md) for examples of how to interact with the HTTP API.
 
 ## Available Tools
 
@@ -194,6 +232,24 @@ For the best results, you can use both tools in combination - search for specifi
 - **Research**: Conduct deep research across your organization's documents
 - **Training**: Provide access to training materials and documentation
 - **Policy Compliance**: Ensure teams have access to the latest policies and procedures
+
+## Test Client
+
+A Python test client is included in the `test-client` directory to help you test and debug the server. The client supports both interactive and command-line modes.
+
+### Prerequisites
+
+- Python 3.6+
+- `requests` library (`pip install requests`)
+
+### Running the Test Client
+
+```bash
+cd test-client
+./mcp_client.py
+```
+
+For more information, see the [test client documentation](test-client/README.md).
 
 ## Development
 

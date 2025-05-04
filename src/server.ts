@@ -22,6 +22,7 @@ import { toolSchemas } from './types/index.js';
 export class OnyxMcpServer {
   private server: Server;
   private onyxApiService: OnyxApiService;
+  private handlersSetup = false;
 
   /**
    * Constructor
@@ -43,8 +44,6 @@ export class OnyxMcpServer {
     // Get configuration from environment variables
     const config = loadConfig();
     this.onyxApiService = new OnyxApiService(config);
-
-    this.setupToolHandlers();
     
     // Error handling
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -56,9 +55,23 @@ export class OnyxMcpServer {
   }
 
   /**
+   * Get the Onyx API service instance
+   * This allows other components to access the API service
+   */
+  getOnyxApiService(): OnyxApiService {
+    return this.onyxApiService;
+  }
+
+  /**
    * Set up tool handlers
+   * This should only be called once before connecting to any transport
    */
   private setupToolHandlers() {
+    if (this.handlersSetup) {
+      return; // Handlers already set up, don't do it again
+    }
+    
+    // Handler for call_tool requests
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
       switch (request.params.name) {
         case 'search_onyx':
@@ -72,18 +85,8 @@ export class OnyxMcpServer {
           );
       }
     });
-  }
-
-  /**
-   * Run the server
-   * @param transport The server transport
-   */
-  // Using any for transport as the Transport type is not exported from the SDK
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async run(transport: any) {
-    // Set up request handlers before connecting
-    this.setupToolHandlers();
     
+    // Handler for list_tools requests
     this.server.setRequestHandler(ListToolsRequestSchema, async () => {
       return {
         tools: [
@@ -93,14 +96,34 @@ export class OnyxMcpServer {
       };
     });
     
-    // Connect to the transport
-    await this.server.connect(transport);
+    this.handlersSetup = true;
+  }
+
+  /**
+   * Run the server with a specific transport
+   * @param transport The server transport
+   * @param transportName A friendly name for the transport (for logging)
+   */
+  // Using any for transport as the Transport type is not exported from the SDK
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async run(transport: any, transportName = 'default') {
+    // Make sure handlers are set up before connecting
+    this.setupToolHandlers();
     
-    // For testing purposes, if the transport has a setupForTest method, call it
-    if (transport.setupForTest && typeof transport.setupForTest === 'function') {
-      transport.setupForTest();
+    try {
+      // Connect to the transport - this will register the SDK's internal handlers
+      await this.server.connect(transport);
+      
+      // For testing purposes, if the transport has a setupForTest method, call it
+      if (transport.setupForTest && typeof transport.setupForTest === 'function') {
+        transport.setupForTest();
+      }
+      
+      console.error(`Onyx MCP Server running on ${transportName} transport`);
+      return true;
+    } catch (error) {
+      console.error(`Error starting Onyx MCP Server on ${transportName} transport:`, error);
+      return false;
     }
-    
-    console.error('Onyx MCP Server running on stdio');
   }
 }
