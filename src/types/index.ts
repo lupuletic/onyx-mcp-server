@@ -1,6 +1,10 @@
 /**
  * Type definitions for the Onyx MCP Server
  */
+import { loadConfig } from '../config/index.js';
+
+// Load configuration to get the default persona ID
+const config = loadConfig();
 
 /**
  * Onyx search result interface
@@ -46,6 +50,8 @@ export interface ChunkInfo {
 export interface OnyxConfig {
   apiUrl: string;
   apiToken: string;
+  defaultPersonaId: number;
+  httpPort: number;
 }
 
 /**
@@ -140,8 +146,8 @@ export const toolSchemas = {
         },
         personaId: {
           type: 'integer',
-          description: 'The ID of the persona to use (default: 15)',
-          default: 15
+          description: `The ID of the persona to use (default: ${config.defaultPersonaId})`,
+          default: config.defaultPersonaId
         },
         chatSessionId: {
           type: 'string',

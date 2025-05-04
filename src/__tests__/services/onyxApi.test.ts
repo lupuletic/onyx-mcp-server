@@ -9,6 +9,8 @@ import { OnyxConfig } from '../../types/index.js';
 const mockConfig: OnyxConfig = {
   apiUrl: 'http://test-api.com/api',
   apiToken: 'test-token',
+  defaultPersonaId: 15,
+  httpPort: 3000
 };
 
 describe('OnyxApiService', () => {
