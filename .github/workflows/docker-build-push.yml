@@ -1,0 +1,66 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Generate image tags
+        id: meta
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          GITHUB_SHA_SHORT=$(echo ${{ github.sha }} | cut -c 1-7)
+          RUN_ID=${{ github.run_id }}
+          
+          # Set outputs for later use
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "github_sha_short=${GITHUB_SHA_SHORT}" >> $GITHUB_OUTPUT
+          echo "run_id=${RUN_ID}" >> $GITHUB_OUTPUT
+          
+          # Define all tags
+          echo "tags=docker.asm.co.il/onyx-mcp-server:latest,docker.asm.co.il/onyx-mcp-server:${VERSION},docker.asm.co.il/onyx-mcp-server:${RUN_ID}" >> $GITHUB_OUTPUT
+
+      - name: Login to Nexus Docker Registry
+        uses: docker/login-action@v3
+        with:
+          registry: docker.asm.co.il
+          username: ${{ vars.NEXUS_USERNAME }}
+          password: ${{ secrets.NEXUS_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          labels: |
+            org.opencontainers.image.title=onyx-mcp-server
+            org.opencontainers.image.description=Model Context Protocol (MCP) server for Onyx AI knowledge bases
+            org.opencontainers.image.version=${{ steps.meta.outputs.version }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.created=${{ github.event.repository.updated_at }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            run.id=${{ steps.meta.outputs.run_id }}
+
+      - name: Update deployment status
+        run: |
+          echo "Image successfully built and pushed to Nexus registry:"
+          echo "  - docker.asm.co.il/onyx-mcp-server:latest"
+          echo "  - docker.asm.co.il/onyx-mcp-server:${{ steps.meta.outputs.version }}"
+          echo "  - docker.asm.co.il/onyx-mcp-server:${{ steps.meta.outputs.run_id }}"

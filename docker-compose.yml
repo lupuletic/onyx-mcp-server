@@ -1,7 +1,6 @@
-version: '3.8'
-
 services:
   onyx-mcp-server:
+    image: docker.asm.co.il/onyx-mcp-server:latest
     build:
       context: .
       dockerfile: Dockerfile
