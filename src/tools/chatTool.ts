@@ -6,6 +6,8 @@ import { McpError, ErrorCode } from '@modelcontextprotocol/sdk/types.js';
 import { OnyxApiService } from '../services/onyxApi.js';
 import { ChatParams } from '../types/index.js';
 
+const DEFAULT_PERSONA_ID = parseInt(process.env.DEFAULT_PERSONA_ID || '15', 10);
+
 /**
  * Handle the chat_with_onyx tool request
  * @param args The tool arguments
@@ -20,7 +22,7 @@ export async function handleChatWithOnyx(args: unknown, onyxApiService: OnyxApiS
 
     const { 
       query, 
-      personaId = 15, 
+      personaId = DEFAULT_PERSONA_ID, 
       documentSets = [],
       // Unused parameter removed: enableAutoDetectFilters
       chatSessionId = null 
