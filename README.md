@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/lupuletic-onyx-mcp-server-badge.png)](https://mseep.ai/app/lupuletic-onyx-mcp-server)
+
 # Onyx MCP Server
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
