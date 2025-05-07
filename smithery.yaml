@@ -17,6 +17,10 @@ startCommand:
         type: string
         default: http://localhost:8080/api
         description: URL of the Onyx API (e.g., http://localhost:8080/api).
+      defaultPersonaId:
+        type: number
+        default: 15
+        description: Default persona ID to use when none is specified (default: 15).
   commandFunction:
     # A JS function that produces the CLI command based on the given config to start the MCP on stdio.
     |-
@@ -25,9 +29,11 @@ startCommand:
       args: ['build/index.js'],
       env: {
         ONYX_API_TOKEN: config.onyxApiToken,
-        ONYX_API_URL: config.onyxApiUrl
+        ONYX_API_URL: config.onyxApiUrl,
+        DEFAULT_PERSONA_ID: config.defaultPersonaId?.toString() || "15"
       }
     })
   exampleConfig:
     onyxApiToken: your-api-token-here
     onyxApiUrl: http://localhost:8080/api
+    defaultPersonaId: 15
