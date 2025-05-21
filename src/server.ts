@@ -82,8 +82,6 @@ export class OnyxMcpServer {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async run(transport: any) {
     // Set up request handlers before connecting
-    this.setupToolHandlers();
-    
     this.server.setRequestHandler(ListToolsRequestSchema, async () => {
       return {
         tools: [
